@@ -72,6 +72,18 @@ def main():
         'parseable, colorized, msvs (visual studio) and html',
     )
 
+    parser.add_option(
+        '-d',
+        '--disable',
+        dest='disable',
+        metavar='<msg ids>',
+        default=['C0111', 'C0301'],
+        action='append',
+        help='Disable the message, report, category or checker '
+        'with the given id(s). You can either give multiple identifiers'
+        ' separated by comma (,) or use this option multiple times',
+    )
+
     options, args = parser.parse_args()
 
     try:
@@ -127,8 +139,10 @@ def main():
 
     if options.pylint:
         checkers.initialize(linter)
-        for msg in ('C0111', 'C0301'):
-            linter.disable(msg)
+        for msgs in options.disable:
+            # This second loop is for allowing: -d C0111 -d C0301,R0904
+            for msg in msgs.split(','):
+                linter.disable(msg)
 
     AstCheckers.register(linter)
 
